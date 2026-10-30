@@ -1,0 +1,70 @@
+.inv-app {
+    // ---------- Token warna ----------
+    --paper: #f4f7f5;
+    --card: #ffffff;
+    --ink: #0f1f1a;
+    --muted: #5b6b64;
+    --line: #d8e2dd;
+    --brand: #0e5a49;
+    --brand-rgb: 14, 90, 73;
+    --brand-soft: #dff0ea;
+    --on-brand: #ffffff;
+    --on-brand-rgb: 255, 255, 255;
+    --tag: #f4b400;
+
+    // Sambungkan ke variabel Bootstrap
+    --bs-body-font-family: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --bs-body-bg: var(--paper);
+    --bs-body-color: var(--ink);
+    --bs-secondary-color: var(--muted);
+    --bs-border-color: var(--line);
+    --bs-link-color-rgb: var(--brand-rgb);
+    --bs-link-hover-color-rgb: var(--brand-rgb);
+
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+
+    // ---------- Dasar ----------
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .font-display {
+        font-family: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+        letter-spacing: -0.02em;
+        font-weight: 700;
+    }
+
+    .inv-muted {
+        color: var(--muted);
+    }
+
+    .inv-line {
+        border-color: var(--line) !important;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    .form-control:focus-visible {
+        outline: 3px solid var(--tag);
+        outline-offset: 2px;
+    }
+
+    .btn {
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .inv-logo {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: var(--brand);
+        color: var(--on-brand);
+    }
+}

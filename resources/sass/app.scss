@@ -1,0 +1,335 @@
+// resources/sass/app.scss
+// Entri untuk halaman welcome (berdiri sendiri, tidak memakai layout).
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Token dan dasar bersama
+@import 'base';
+
+// ===== Gaya halaman welcome =====
+.inv-app {
+
+    // ---------- Logo ukuran besar ----------
+    .inv-logo-lg {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    // ---------- Tombol ----------
+    .btn-brand {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: var(--on-brand);
+
+        &:hover,
+        &:focus {
+            filter: brightness(1.1);
+            color: var(--on-brand);
+        }
+    }
+
+    .btn-tag {
+        background: var(--tag);
+        border-color: var(--tag);
+        color: #000;
+
+        &:hover,
+        &:focus {
+            filter: brightness(1.05);
+            color: #000;
+        }
+    }
+
+    .btn-white-inv {
+        background: #fff;
+        border-color: #fff;
+        color: #000;
+
+        &:hover,
+        &:focus {
+            background: rgba(255, 255, 255, .9);
+            color: #000;
+        }
+    }
+
+    .btn-outline-inv {
+        background: var(--card);
+        border: 1px solid var(--line);
+        color: var(--ink);
+
+        &:hover,
+        &:focus {
+            background: var(--brand-soft);
+            color: var(--ink);
+        }
+    }
+
+    // ---------- Hero ----------
+    .inv-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .25rem .75rem;
+        border-radius: 999px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-size: .875rem;
+        font-weight: 500;
+
+        &::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--brand);
+        }
+    }
+
+    .inv-title {
+        font-size: clamp(2.25rem, 5vw, 3.75rem);
+        line-height: 1.05;
+        font-weight: 800;
+    }
+
+    .inv-lead {
+        font-size: 1.125rem;
+        line-height: 1.65;
+        max-width: 36rem;
+    }
+
+    // ---------- Kartu pratinjau gaya label aset ----------
+    .inv-ticket {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 3rem 1.5rem 1.5rem;
+        box-shadow: 0 24px 60px -24px rgba(var(--brand-rgb), .35);
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            width: 46px;
+            height: 8px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: var(--paper);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .25);
+        }
+
+        .inv-barcode {
+            width: 10rem;
+            height: 28px;
+            opacity: .85;
+            background: repeating-linear-gradient(90deg,
+                    var(--ink) 0 2px, transparent 2px 4px,
+                    var(--ink) 4px 5px, transparent 5px 9px,
+                    var(--ink) 9px 12px, transparent 12px 14px);
+        }
+    }
+
+    .inv-count {
+        background: var(--tag);
+        color: #000;
+        font-size: .75rem;
+        font-weight: 600;
+        padding: .25rem .6rem;
+        border-radius: 6px;
+    }
+
+    .inv-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .75rem 0;
+        border-top: 1px solid var(--line);
+        font-size: .9rem;
+        animation: invRowIn .5s ease-out both;
+
+        &:first-child {
+            border-top: 0;
+        }
+
+        &:nth-child(1) {
+            animation-delay: .15s;
+        }
+
+        &:nth-child(2) {
+            animation-delay: .27s;
+        }
+
+        &:nth-child(3) {
+            animation-delay: .39s;
+        }
+
+        &:nth-child(4) {
+            animation-delay: .51s;
+        }
+
+        &:nth-child(5) {
+            animation-delay: .63s;
+        }
+    }
+
+    .inv-code {
+        font-size: .75rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .inv-status {
+        display: inline-flex;
+        align-items: center;
+        gap: .375rem;
+        flex-shrink: 0;
+        padding: .25rem .625rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 500;
+
+        &::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+    }
+
+    .inv-status-ok {
+        color: #1f9d6b;
+        background: rgba(31, 157, 107, .14);
+    }
+
+    .inv-status-borrowed {
+        color: #2f6fdb;
+        background: rgba(47, 111, 219, .14);
+    }
+
+    .inv-status-service {
+        color: #c98400;
+        background: rgba(201, 132, 0, .14);
+    }
+
+    .inv-status-broken {
+        color: #d1453b;
+        background: rgba(209, 69, 59, .14);
+    }
+
+    // ---------- Fitur ----------
+    .inv-section-alt {
+        background: var(--card);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .inv-feature {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 1.5rem;
+
+        svg {
+            color: var(--brand);
+        }
+
+        p {
+            color: var(--muted);
+            font-size: .9rem;
+            margin-bottom: 0;
+        }
+    }
+
+    .inv-feature-main {
+        background: var(--brand);
+        border-radius: 24px;
+        padding: 2rem;
+        color: var(--on-brand);
+
+        p {
+            opacity: .85;
+            max-width: 28rem;
+        }
+    }
+
+    .inv-chip {
+        display: inline-block;
+        padding: .25rem .75rem;
+        border-radius: 999px;
+        background: rgba(var(--on-brand-rgb), .15);
+        font-size: .875rem;
+    }
+
+    // ---------- Langkah ----------
+    .inv-step {
+        border-top: 2px solid var(--brand);
+        padding-top: 1.25rem;
+        height: 100%;
+
+        p {
+            color: var(--muted);
+            font-size: .9rem;
+            margin-bottom: 0;
+        }
+    }
+
+    .inv-step-no {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--tag);
+        color: #000;
+        font-weight: 700;
+        font-size: .875rem;
+    }
+
+    // ---------- Ajakan akhir ----------
+    .inv-cta {
+        background: var(--brand);
+        color: var(--on-brand);
+        border-radius: 24px;
+        padding: 2.5rem 1.75rem;
+
+        @media (min-width: 576px) {
+            padding: 2.5rem 3rem;
+        }
+
+        p {
+            opacity: .85;
+        }
+    }
+
+    .inv-footer {
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: .875rem;
+    }
+}
+
+@keyframes invRowIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .inv-app .inv-row {
+        animation: none;
+    }
+}

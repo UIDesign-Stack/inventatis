@@ -1,0 +1,699 @@
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Token dan dasar bersama
+@import 'base';
+
+// ===== Gaya layout aplikasi + dashboard =====
+.inv-app {
+    // ---------- Navbar ----------
+    .inv-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+
+        .navbar-toggler {
+            border-color: var(--line);
+            &:focus { box-shadow: 0 0 0 3px rgba(var(--brand-rgb), .25); }
+        }
+
+        .navbar-nav { gap: .25rem; }
+
+        .nav-link {
+            color: var(--muted);
+            font-weight: 500;
+            padding: .5rem .85rem;
+            border-radius: 10px;
+            transition: background-color .15s, color .15s;
+
+            &:hover { color: var(--ink); background: var(--brand-soft); }
+            &.active,
+            &.show { color: var(--brand); background: var(--brand-soft); }
+        }
+    }
+
+    .inv-brand {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 1.1rem;
+
+        &:hover { color: var(--ink); }
+    }
+
+    // Menu pengguna
+    .inv-user {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .inv-avatar {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--tag);
+        color: #000;
+        font-weight: 700;
+        font-size: .85rem;
+        flex-shrink: 0;
+    }
+
+    .inv-role {
+        font-size: .72rem;
+        font-weight: 600;
+        padding: .1rem .5rem;
+        border-radius: 999px;
+        background: var(--brand-soft);
+        color: var(--brand);
+    }
+
+    // ---------- Dropdown ----------
+    .dropdown-menu {
+        --bs-dropdown-bg: var(--card);
+        --bs-dropdown-border-color: var(--line);
+        --bs-dropdown-border-radius: 14px;
+        --bs-dropdown-link-color: var(--ink);
+        --bs-dropdown-link-hover-bg: var(--brand-soft);
+        --bs-dropdown-link-hover-color: var(--ink);
+        --bs-dropdown-link-active-bg: var(--brand);
+        --bs-dropdown-link-active-color: var(--on-brand);
+        padding: .4rem;
+        box-shadow: 0 16px 40px -16px rgba(14, 90, 73, .35);
+    }
+
+    .dropdown-item { border-radius: 8px; padding: .5rem .75rem; }
+
+    // ---------- Konten halaman ----------
+    .inv-main { padding-top: 1.75rem; padding-bottom: 3rem; }
+
+    // ---------- Tombol ----------
+    .btn-primary {
+        --bs-btn-color: var(--on-brand);
+        --bs-btn-bg: var(--brand);
+        --bs-btn-border-color: var(--brand);
+        --bs-btn-hover-color: var(--on-brand);
+        --bs-btn-hover-bg: var(--brand);
+        --bs-btn-hover-border-color: var(--brand);
+        --bs-btn-active-color: var(--on-brand);
+        --bs-btn-active-bg: var(--brand);
+        --bs-btn-active-border-color: var(--brand);
+        --bs-btn-disabled-bg: var(--brand);
+        --bs-btn-disabled-border-color: var(--brand);
+        --bs-btn-focus-shadow-rgb: var(--brand-rgb);
+
+        &:hover { filter: brightness(1.1); }
+    }
+
+    .btn-outline-primary {
+        --bs-btn-color: var(--brand);
+        --bs-btn-border-color: var(--brand);
+        --bs-btn-hover-color: var(--on-brand);
+        --bs-btn-hover-bg: var(--brand);
+        --bs-btn-hover-border-color: var(--brand);
+        --bs-btn-active-color: var(--on-brand);
+        --bs-btn-active-bg: var(--brand);
+        --bs-btn-active-border-color: var(--brand);
+        --bs-btn-focus-shadow-rgb: var(--brand-rgb);
+    }
+
+    // ---------- Kartu ----------
+    .card {
+        --bs-card-bg: var(--card);
+        --bs-card-border-color: var(--line);
+        --bs-card-border-radius: 16px;
+        --bs-card-inner-border-radius: 15px;
+        --bs-card-cap-bg: transparent;
+        --bs-card-cap-padding-y: 1rem;
+    }
+
+    .card-header {
+        font-family: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+        font-weight: 700;
+        border-bottom-color: var(--line);
+    }
+
+    // ---------- Tabel ----------
+    .table {
+        --bs-table-bg: transparent;
+        --bs-table-color: var(--ink);
+        --bs-table-border-color: var(--line);
+        --bs-table-striped-bg: rgba(var(--brand-rgb), .04);
+        --bs-table-hover-bg: rgba(var(--brand-rgb), .07);
+        --bs-table-hover-color: var(--ink);
+
+        thead th {
+            color: var(--muted);
+            font-size: .8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            border-bottom-width: 1px;
+        }
+
+        td { vertical-align: middle; }
+    }
+
+    // ---------- Form ----------
+    .form-control,
+    .form-select {
+        background-color: var(--card);
+        border-color: var(--line);
+        border-radius: 10px;
+        padding: .55rem .8rem;
+
+        &:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(var(--brand-rgb), .2);
+        }
+    }
+
+    .form-label { font-weight: 500; font-size: .9rem; }
+
+    .form-check-input:checked {
+        background-color: var(--brand);
+        border-color: var(--brand);
+    }
+
+    // ---------- Paginasi ----------
+    .pagination {
+        --bs-pagination-color: var(--ink);
+        --bs-pagination-bg: var(--card);
+        --bs-pagination-border-color: var(--line);
+        --bs-pagination-hover-bg: var(--brand-soft);
+        --bs-pagination-hover-color: var(--ink);
+        --bs-pagination-hover-border-color: var(--line);
+        --bs-pagination-active-bg: var(--brand);
+        --bs-pagination-active-border-color: var(--brand);
+        --bs-pagination-active-color: var(--on-brand);
+        --bs-pagination-disabled-bg: var(--card);
+        --bs-pagination-disabled-border-color: var(--line);
+        --bs-pagination-focus-box-shadow: 0 0 0 3px rgba(var(--brand-rgb), .2);
+    }
+
+    // ---------- Modal ----------
+    .modal-content {
+        background: var(--card);
+        border-color: var(--line);
+        border-radius: 16px;
+    }
+
+    // ---------- Dashboard: sapaan ----------
+    .inv-hello {
+        background: var(--brand);
+        color: var(--on-brand);
+        border-radius: 24px;
+        padding: 1.75rem;
+
+        @media (min-width: 768px) { padding: 2rem 2.5rem; }
+
+        h1 { color: inherit; }
+
+        .inv-barcode {
+            width: 9rem;
+            height: 28px;
+            flex-shrink: 0;
+            opacity: .55;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--on-brand) 0 2px, transparent 2px 4px,
+                var(--on-brand) 4px 5px, transparent 5px 9px,
+                var(--on-brand) 9px 12px, transparent 12px 14px
+            );
+        }
+    }
+
+    .inv-hello-date { font-size: .875rem; opacity: .8; }
+    .inv-hello-sub  { opacity: .85; max-width: 32rem; }
+
+    // ---------- Dashboard: ringkasan ----------
+    .inv-stat {
+        height: 100%;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1.1rem 1.25rem;
+    }
+
+    .inv-stat-label { color: var(--muted); font-size: .875rem; }
+    .inv-stat-value { font-size: 2rem; line-height: 1.15; margin-top: .25rem; font-variant-numeric: tabular-nums; }
+    .inv-stat-note  { color: var(--muted); font-size: .8rem; margin-top: .15rem; }
+
+    // ---------- Dashboard: akses cepat ----------
+    .inv-quick {
+        height: 100%;
+        display: flex;
+        align-items: flex-start;
+        gap: .9rem;
+        padding: 1.1rem 1.25rem;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        color: var(--ink);
+        text-decoration: none;
+        transition: border-color .15s, box-shadow .15s;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--ink);
+            border-color: var(--brand);
+            box-shadow: 0 10px 28px -16px rgba(var(--brand-rgb), .6);
+        }
+    }
+
+    .inv-quick-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: var(--brand-soft);
+        color: var(--brand);
+    }
+}
+// ===== Halaman daftar (Data barang, dll.) =====
+.inv-app {
+    .inv-page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .inv-page-sub {
+        color: var(--muted);
+        font-size: .9rem;
+    }
+
+    .inv-panel {
+        overflow: hidden;
+    }
+
+    .inv-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--line);
+
+        .inv-search {
+            position: relative;
+            flex: 1 1 16rem;
+
+            svg {
+                position: absolute;
+                left: .85rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--muted);
+                pointer-events: none;
+            }
+
+            .form-control {
+                padding-left: 2.4rem;
+            }
+        }
+
+        .inv-filter {
+            flex: 0 1 14rem;
+        }
+    }
+
+    .inv-table {
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .inv-code {
+            font-size: .78rem;
+            color: var(--muted);
+            letter-spacing: .02em;
+        }
+
+        .inv-num {
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .inv-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .15rem .6rem;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 600;
+        background: rgba(var(--pill-rgb), .12);
+        color: rgb(var(--pill-rgb));
+
+        &::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        &--ok {
+            --pill-rgb: var(--bs-success-rgb);
+        }
+
+        &--bad {
+            --pill-rgb: var(--bs-danger-rgb);
+        }
+
+        &--warn {
+            --pill-rgb: 156, 99, 0;
+        }
+    }
+
+    .inv-actions {
+        display: flex;
+        justify-content: flex-start;
+        gap: .25rem;
+    }
+
+    .inv-icon-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-grid;
+        place-items: center;
+        padding: 0;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: var(--muted);
+        transition: background-color .15s, color .15s;
+
+        &:hover,
+        &:focus-visible {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        &--danger:hover,
+        &--danger:focus-visible {
+            background: rgba(var(--bs-danger-rgb), .12);
+            color: var(--bs-danger);
+        }
+    }
+
+    .inv-empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+    }
+
+    .inv-panel-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .85rem 1.25rem;
+        border-top: 1px solid var(--line);
+
+        .pagination {
+            margin-bottom: 0;
+        }
+    }
+
+    .inv-alert {
+        border-radius: 12px;
+        border: 1px solid transparent;
+
+        &--success {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        &--danger {
+            background: rgba(var(--bs-danger-rgb), .1);
+            color: var(--bs-danger);
+        }
+    }
+}
+// ===== Halaman form (Barang masuk, dll.) =====
+.inv-app {
+    .inv-form-wrap {
+        max-width: 820px;
+    }
+
+    .inv-back {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        margin-bottom: 1rem;
+        color: var(--muted);
+        font-size: .9rem;
+        text-decoration: none;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--brand);
+        }
+    }
+
+    .inv-form-section {
+        padding: 1.5rem 1.5rem 1.6rem;
+        border-bottom: 1px solid var(--line);
+
+        @media (min-width: 768px) {
+            padding: 1.75rem 2rem;
+        }
+    }
+
+    .inv-form-title {
+        margin: 0 0 1rem;
+        font-family: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    .inv-form-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: .6rem;
+        padding: 1rem 1.5rem;
+
+        @media (min-width: 768px) {
+            padding: 1.1rem 2rem;
+        }
+    }
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+}
+
+.school-logo {
+    width: 85px;
+    flex-shrink: 0;
+}
+
+.school-logo img {
+    width: 85px;
+    height: 85px;
+    object-fit: contain;
+}
+
+.school-info {
+    flex: 1;
+}
+
+.school-info h2 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.school-info h1 {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 3px 0;
+}
+
+.school-info p {
+    font-size: 10px;
+    margin: 2px 0;
+}
+
+.kop-line {
+    border-top: 3px solid #000;
+    border-bottom: 1px solid #000;
+    height: 5px;
+    margin-top: 12px;
+}
+
+.report-title h2 {
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: underline;
+    margin-bottom: 5px;
+}
+
+.report-title p {
+    font-size: 12px;
+    margin: 2px 0;
+}
+
+.report-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 12px;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid #333;
+    padding: 7px 5px;
+    vertical-align: middle;
+}
+
+.report-table thead th {
+    background: #e5e7eb;
+    text-align: center;
+    font-weight: 700;
+}
+
+.report-table tfoot th {
+    background: #f3f4f6;
+    font-weight: 700;
+}
+
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 35px;
+    page-break-inside: avoid;
+}
+
+.signature-box {
+    width: 220px;
+    text-align: center;
+    font-size: 11px;
+}
+
+.signature-box p {
+    margin: 3px 0;
+}
+
+.signature-space {
+    height: 65px;
+}
+
+.signature-name {
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Sembunyikan navbar dan elemen aplikasi */
+    .inv-nav,
+    .no-print {
+        display: none !important;
+    }
+
+    /* Hilangkan jarak layout saat dicetak */
+    .inv-app,
+    .inv-main {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background: #fff !important;
+    }
+
+    .inv-main .container {
+        max-width: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Area laporan */
+    .print-area {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        background: #fff !important;
+    }
+
+    .print-area .card-body {
+        padding: 0 !important;
+    }
+
+    /* Tabel laporan */
+    .report-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 10px !important;
+    }
+
+    .report-table thead {
+        display: table-header-group;
+    }
+
+    .report-table tr {
+        page-break-inside: avoid;
+    }
+
+    .report-table th,
+    .report-table td {
+        border: 1px solid #333 !important;
+    }
+
+    .report-table th {
+        background: #e5e7eb !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .report-table tfoot th {
+        background: #f3f4f6 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .signature-section {
+        page-break-inside: avoid;
+    }
+}
