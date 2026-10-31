@@ -22,6 +22,7 @@
         @php
             // Menu utama: tampil hanya jika route-nya ada dan user punya permission-nya
             $menus = [
+                ['label' => 'Dashboard',  'route' => 'home',             'can' => [],                'active' => ['home']],
                 ['label' => 'Barang',     'route' => 'items.index',      'can' => 'item.manage',     'active' => ['items.index', 'items.create', 'items.edit', 'items.show']],
                 ['label' => 'Kategori',   'route' => 'categories.index', 'can' => 'category.manage', 'active' => ['categories.*']],
                 ['label' => 'Guru',       'route' => 'teachers.index',   'can' => 'teacher.manage',  'active' => ['teachers.*']],
@@ -49,11 +50,10 @@
         <nav class="navbar navbar-expand-md inv-nav">
             <div class="container">
                 <a class="inv-brand font-display fw-bold" href="{{ url('/') }}">
-                    <span class="inv-logo">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>
-                        </svg>
-                    </span>
+                    <div class="school-logo">
+                            <img src="{{ asset('images/logo.png') }}"
+                                alt="Logo Sekolah">
+                        </div>
                     {{ config('app.name', 'Laravel') }}
                 </a>
 

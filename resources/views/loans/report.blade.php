@@ -194,7 +194,7 @@
                     <div class="report-header">
 
                         <div class="school-logo">
-                            <img src="{{ asset('images/logo.jpg') }}"
+                            <img src="{{ asset('images/logo.png') }}"
                                 alt="Logo Sekolah">
                         </div>
 

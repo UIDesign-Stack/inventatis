@@ -1,4 +1,3 @@
-{{-- Data pengembalian: tampil hanya jika peminjaman sudah dikembalikan --}}
 @if ($loan->status === 'returned')
     <div class="card mb-3">
         <div class="card-header">Data Pengembalian</div>

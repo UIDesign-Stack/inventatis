@@ -504,13 +504,13 @@
 }
 
 .school-logo {
-    width: 85px;
+    width: 55px;
     flex-shrink: 0;
 }
 
 .school-logo img {
-    width: 85px;
-    height: 85px;
+    width: 55px;
+    height: 55px;
     object-fit: contain;
 }
 
@@ -695,5 +695,85 @@
 
     .signature-section {
         page-break-inside: avoid;
+    }
+}
+.inv-app {
+    .label-sheet {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-auto-rows: min-content;   // tinggi baris mengikuti isi label
+        align-content: start;          // jangan meregangkan baris mengisi wadah
+        gap: 4mm;
+        padding: 1.25rem;
+
+        @media (max-width: 767.98px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    .label-card {
+        display: flex;
+        align-items: center;
+        gap: 3mm;
+        min-height: 30mm;
+        padding: 3mm;
+        background: #fff;
+        color: #000;
+        border: 1px dashed #b9c6c0;   // garis potong
+        border-radius: 3mm;
+        break-inside: avoid;
+    }
+
+    .label-qr {
+        width: 22mm;
+        height: 22mm;
+        flex-shrink: 0;
+        image-rendering: pixelated;
+    }
+
+    .label-body { min-width: 0; }
+
+    .label-org {
+        font-size: 6.5pt;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: #444;
+    }
+
+    .label-name {
+        margin-top: .5mm;
+        font-size: 9.5pt;
+        font-weight: 700;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .label-code {
+        margin-top: 1mm;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 9pt;
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+
+    .label-meta { margin-top: .5mm; font-size: 7pt; color: #555; }
+}
+
+// Ukuran kertas (A4 portrait) diatur di views/items/labels.blade.php lewat aturan @page khusus halaman itu,
+// karena aturan @page di layout ini landscape (untuk laporan).
+
+@media print {
+    .inv-app .label-sheet {
+        padding: 0 !important;
+        gap: 3mm;
+    }
+
+    .inv-app .label-card {
+        border: 1px solid #000;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }

@@ -28,8 +28,7 @@ class LoanController extends Controller
     {
         $this->middleware('permission:loan.view')->only(['index', 'show', 'returns']);
         $this->middleware('permission:loan.create')->only(['create', 'store', 'destroy', 'returnLoan']);
-        $this->middleware('permission:loan.approve')->only(['decide', 'cancel']);
-        $this->middleware('permission:loan.handover')->only(['handover']);
+        $this->middleware('permission:loan.approve')->only(['decide']);
         $this->middleware('permission:stock-out.report')->only(['report']);
     }
 
@@ -92,8 +91,12 @@ class LoanController extends Controller
         return view('loans.show', compact('loan', 'statuses'));
     }
 
-    /** Sarpras memutuskan: approved / rejected / pending. Jika disetujui, stok langsung dikurangi */
-    public function decide(Request $request, Loan $loan): RedirectResponse
+    /**
+     * Sarpras memutuskan: approved / rejected / pending.
+     * Jika disetujui: barang dianggap langsung diserahkan ke guru, sehingga
+     * stok dikurangi, nomor surat dibuat, dan data serah terima dicatat sekaligus.
+     */
+    public function decide(Request $request, Loan $loan, HandoverLetterNumber $numbers): RedirectResponse
     {
         $validated = $request->validate([
             'decision' => ['required', Rule::in([
@@ -107,13 +110,20 @@ class LoanController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($loan, $validated, $request) {
+            DB::transaction(function () use ($loan, $validated, $request, $numbers) {
                 // kunci baris supaya dua ACC bersamaan tidak lolos dengan stok yang sama
                 $loan = Loan::lockForUpdate()->findOrFail($loan->id);
 
                 if ($loan->status !== Loan::STATUS_PENDING) {
                     throw new RuntimeException('Keputusan hanya bisa diberikan pada peminjaman yang berstatus pending.');
                 }
+
+                $data = [
+                    'status' => $validated['decision'],
+                    'status_note' => $validated['status_note'] ?? null,
+                    'decided_by' => $request->user()->id,
+                    'decided_at' => now(),
+                ];
 
                 if ($validated['decision'] === Loan::STATUS_APPROVED) {
                     $item = Item::lockForUpdate()->findOrFail($loan->item_id);
@@ -125,47 +135,14 @@ class LoanController extends Controller
                     }
 
                     $item->decrement('stock', $loan->quantity);
+
+                    // ACC = barang diserahkan ke guru
+                    $data['handover_letter_number'] = $numbers->generate(now());
+                    $data['sarpras_id'] = $request->user()->id;
+                    $data['handed_over_at'] = now();
                 }
 
-                $loan->update([
-                    'status' => $validated['decision'],
-                    'status_note' => $validated['status_note'] ?? null,
-                    'decided_by' => $request->user()->id,
-                    'decided_at' => now(),
-                ]);
-            });
-        } catch (RuntimeException $e) {
-            return redirect()
-                ->route('loans.show', $loan)
-                ->with('error', $e->getMessage());
-        }
-
-        $message = match ($validated['decision']) {
-            Loan::STATUS_APPROVED => 'Peminjaman disetujui dan stok barang telah dikurangi. Silakan lanjutkan dengan serah terima.',
-            Loan::STATUS_REJECTED => 'Peminjaman ditolak.',
-            default => 'Peminjaman tetap pending.',
-        };
-
-        return redirect()->route('loans.show', $loan)->with('success', $message);
-    }
-
-    /** Sarpras menyerahkan barang; nomor surat dibuat otomatis (stok sudah dikurangi saat ACC) */
-    public function handover(Request $request, Loan $loan, HandoverLetterNumber $numbers): RedirectResponse
-    {
-        try {
-            DB::transaction(function () use ($loan, $request, $numbers) {
-                $loan = Loan::lockForUpdate()->findOrFail($loan->id);
-
-                if ($loan->status !== Loan::STATUS_APPROVED) {
-                    throw new RuntimeException('Hanya peminjaman yang sudah disetujui yang bisa diserahkan.');
-                }
-
-                $loan->update([
-                    'status' => Loan::STATUS_HANDED_OVER,
-                    'sarpras_id' => $request->user()->id,
-                    'handover_letter_number' => $numbers->generate(now()),
-                    'handed_over_at' => now(),
-                ]);
+                $loan->update($data);
             });
         } catch (RuntimeException $e) {
             return redirect()
@@ -175,9 +152,13 @@ class LoanController extends Controller
 
         $loan->refresh();
 
-        return redirect()
-            ->route('loans.show', $loan)
-            ->with('success', "Serah terima berhasil dicatat dengan nomor surat {$loan->handover_letter_number}.");
+        $message = match ($validated['decision']) {
+            Loan::STATUS_APPROVED => "Peminjaman disetujui. Barang dicatat telah diserahkan ke guru dengan nomor surat {$loan->handover_letter_number} dan stok telah dikurangi.",
+            Loan::STATUS_REJECTED => 'Peminjaman ditolak.',
+            default => 'Peminjaman tetap pending.',
+        };
+
+        return redirect()->route('loans.show', $loan)->with('success', $message);
     }
 
     /** Daftar peminjaman yang disetujui / sedang dipinjam dan belum dikembalikan */
@@ -245,41 +226,6 @@ class LoanController extends Controller
         return redirect()
             ->route('loans.returns')
             ->with('success', 'Pengembalian berhasil dicatat dan stok barang telah ditambahkan kembali.');
-    }
-
-    /** Batalkan peminjaman yang sudah di-ACC tapi belum diserahkan; stok dikembalikan */
-    public function cancel(Request $request, Loan $loan): RedirectResponse
-    {
-        $validated = $request->validate([
-            'status_note' => ['required', 'string', 'max:500'],
-        ], [
-            'status_note.required' => 'Alasan pembatalan wajib diisi.',
-        ]);
-
-        try {
-            DB::transaction(function () use ($loan, $validated) {
-                $loan = Loan::lockForUpdate()->findOrFail($loan->id);
-
-                if ($loan->status !== Loan::STATUS_APPROVED) {
-                    throw new RuntimeException('Hanya peminjaman yang sudah disetujui dan belum diserahkan yang bisa dibatalkan.');
-                }
-
-                Item::lockForUpdate()->findOrFail($loan->item_id)->increment('stock', $loan->quantity);
-
-                $loan->update([
-                    'status' => Loan::STATUS_CANCELLED,
-                    'status_note' => $validated['status_note'],
-                ]);
-            });
-        } catch (RuntimeException $e) {
-            return redirect()
-                ->route('loans.show', $loan)
-                ->with('error', $e->getMessage());
-        }
-
-        return redirect()
-            ->route('loans.show', $loan)
-            ->with('success', 'Peminjaman dibatalkan dan stok barang telah dikembalikan.');
     }
 
     /** Hanya pengajuan yang belum diproses / ditolak / dibatalkan yang boleh dihapus */

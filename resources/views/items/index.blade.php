@@ -9,14 +9,31 @@
             <h1 class="h3 font-display fw-bold mb-1">Data barang</h1>
             <p class="inv-page-sub mb-0">{{ number_format($items->total()) }} barang tercatat</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-2">
             @can('stock-in.report')
                 <a href="{{ route('items.report') }}" class="btn btn-outline-primary">Laporan barang masuk</a>
             @endcan
+
             <a href="{{ route('items.create') }}" class="btn btn-primary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                 Barang masuk
             </a>
+
+            {{-- Cetak label QR: barang dipilih lewat checkbox di tabel (atribut form="label-form") --}}
+            @can('item.manage')
+                <form id="label-form" method="GET" action="{{ route('items.labels') }}"
+                      class="d-flex flex-wrap align-items-center gap-2">
+                    <select name="mode" class="form-select w-auto" aria-label="Mode label">
+                        <option value="unit" selected>Label per unit (sesuai jumlah barang)</option>
+                        <option value="type">Satu label per jenis</option>
+                    </select>
+                    <input type="number" name="copies" value="1" min="1" max="50"
+                           class="form-control" style="width: 5rem"
+                           aria-label="Jumlah salinan per jenis"
+                           title="Jumlah salinan, hanya dipakai pada mode 'Satu label per jenis'">
+                    <button type="submit" class="btn btn-outline-secondary">Cetak label terpilih</button>
+                </form>
+            @endcan
         </div>
     </div>
 
@@ -27,6 +44,14 @@
 
     @if (session('error'))
         <div class="alert inv-alert inv-alert--danger" role="alert">{{ session('error') }}</div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert inv-alert inv-alert--danger" role="alert">
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+        </div>
     @endif
 
     <div class="card inv-panel">
@@ -62,20 +87,33 @@
             <table class="table table-hover align-middle mb-0 inv-table">
                 <thead>
                     <tr>
-                        <th class="">No</th>
+                        @can('item.manage')
+                            <th style="width: 2rem">
+                                <input type="checkbox" id="check-all" class="form-check-input"
+                                       aria-label="Pilih semua barang di halaman ini">
+                            </th>
+                        @endcan
+                        <th>No</th>
                         <th>Barang</th>
                         <th>Kategori</th>
                         <th>Supplier</th>
-                        <th class="">Stok</th>
+                        <th>Stok</th>
                         <th>Kondisi</th>
                         <th>Tanggal terima</th>
-                        <th class="">Aksi</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($items as $item)
                         <tr>
-                            <td class=" text-muted">{{ $items->firstItem() + $loop->index }}</td>
+                            @can('item.manage')
+                                <td>
+                                    <input type="checkbox" name="ids[]" value="{{ $item->id }}"
+                                           form="label-form" class="form-check-input label-check"
+                                           aria-label="Pilih {{ $item->name }}">
+                                </td>
+                            @endcan
+                            <td class="text-muted">{{ $items->firstItem() + $loop->index }}</td>
                             <td>
                                 <div class="fw-semibold">{{ $item->name }}</div>
                                 <div class="inv-code">{{ $item->code }}</div>
@@ -102,7 +140,7 @@
                                 @endswitch
                             </td>
                             <td class="inv-num text-nowrap">{{ $item->received_date->format('d/m/Y') }}</td>
-                            <td class="">
+                            <td>
                                 <div class="inv-actions">
                                     <a href="{{ route('items.show', $item) }}" class="inv-icon-btn"
                                        title="Detail" aria-label="Detail {{ $item->name }}">
@@ -128,7 +166,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <div class="inv-empty">
                                     @if (request()->filled('search') || request()->filled('category_id'))
                                         <p class="fw-semibold mb-1">Tidak ada barang yang cocok</p>
@@ -158,4 +196,13 @@
         @endif
     </div>
 </div>
+
+<script>
+    // Pilih / batal pilih semua barang di halaman ini untuk cetak label
+    document.getElementById('check-all')?.addEventListener('change', function (e) {
+        document.querySelectorAll('.label-check').forEach(function (box) {
+            box.checked = e.target.checked;
+        });
+    });
+</script>
 @endsection

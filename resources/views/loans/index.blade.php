@@ -103,6 +103,13 @@
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </a>
 
+                                    @can('item.manage')
+                                        <a href="{{ route('items.labels', ['ids' => [$loan->item->id]]) }}" target="_blank" rel="noopener"
+                                           class="inv-icon-btn" title="Cetak label barang" aria-label="Cetak label {{ $loan->item->name }}">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+                                        </a>
+                                    @endcan
+
                                     @can('loan.create')
                                         @if (in_array($loan->status, ['pending', 'rejected', 'cancelled'], true))
                                             <form action="{{ route('loans.destroy', $loan) }}" method="POST" class="d-inline"

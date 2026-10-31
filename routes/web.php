@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemLabelController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TeacherController;
@@ -16,7 +18,7 @@ Route::get('/', function () {
 // Pendaftaran publik dimatikan: user baru hanya dibuat operator lewat menu User
 Auth::routes(['register' => false]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
 
@@ -32,10 +34,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('teachers', TeacherController::class)
         ->middleware('permission:teacher.manage');
 
-    // Laporan barang masuk: harus sebelum resource items
+    // Laporan barang masuk dan cetak label: harus sebelum resource items
     Route::get('items/report', [ItemController::class, 'report'])
         ->middleware('permission:stock-in.report')
         ->name('items.report');
+
+    Route::get('items/labels', ItemLabelController::class)
+        ->middleware('permission:item.manage')
+        ->name('items.labels');
 
     Route::resource('items', ItemController::class)
         ->middleware('permission:item.manage');
@@ -48,6 +54,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
 
     Route::patch('loans/{loan}/decide', [LoanController::class, 'decide'])->name('loans.decide');
-    Route::patch('loans/{loan}/handover', [LoanController::class, 'handover'])->name('loans.handover');
     Route::resource('loans', LoanController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
 });
