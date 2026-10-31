@@ -224,8 +224,7 @@
 
     <footer class="inv-footer">
         <div class="container py-4 d-flex flex-column flex-sm-row justify-content-between gap-2">
-            <span>&copy; {{ date('Y') }} {{ config('app.name', 'Inventaris Sekolah') }}. Seluruh hak dilindungi.</span>
-            <span>Dibangun dengan Laravel v{{ app()->version() }}</span>
+            <span>&copy; {{ date('Y') }} {{ config('app.name', 'Inventaris Sekolah') }} | Baihaqi Hakim.</span>
         </div>
     </footer>
 
