@@ -77,8 +77,8 @@
 
                     <dl class="d-flex flex-wrap gap-4 mt-5 mb-0">
                         <div><dt class="fw-normal small inv-muted">Pencatatan</dt><dd class="font-display fs-5 fw-bold mb-0">Real-time</dd></div>
-                        <div><dt class="fw-normal small inv-muted">Akses</dt><dd class="font-display fs-5 fw-bold mb-0">Admin, guru, siswa</dd></div>
-                        <div><dt class="fw-normal small inv-muted">Laporan</dt><dd class="font-display fs-5 fw-bold mb-0">PDF dan Excel</dd></div>
+                        <div><dt class="fw-normal small inv-muted">Akses</dt><dd class="font-display fs-5 fw-bold mb-0">Operator,Sarpras</dd></div>
+                        <div><dt class="fw-normal small inv-muted">Laporan</dt><dd class="font-display fs-5 fw-bold mb-0">PDF</dd></div>
                     </dl>
                 </div>
 
@@ -138,7 +138,7 @@
                             <h3 class="font-display fs-3 fw-bold mt-4">Data barang lengkap</h3>
                             <p>Simpan nama, merek, tahun pengadaan, sumber dana (BOS, komite, hibah), harga, foto, dan lokasi ruangan di satu tempat. Cari barang apa pun dalam hitungan detik.</p>
                             <div class="d-flex flex-wrap gap-2 mt-4">
-                                @foreach (['Kategori', 'Ruangan', 'Sumber dana', 'Nilai aset', 'Foto barang'] as $chip)
+                                @foreach (['Kategori', 'Barang', 'Supplier', 'Peminjaman dan Pengembalian', 'Laporan'] as $chip)
                                     <span class="inv-chip">{{ $chip }}</span>
                                 @endforeach
                             </div>
