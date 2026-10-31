@@ -277,14 +277,13 @@ class LoanController extends Controller
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
             'teacher_id' => ['nullable', 'exists:teachers,id'],
-            'status' => [
-                'nullable',
-                'in:pending,approved,rejected,handed_over,returned,cancelled'
-            ],
+            'status' => ['nullable', Rule::in([...array_keys(self::STATUSES), 'decided'])],
         ]);
 
+        $status = $validated['status'] ?? null;
+
         $loans = Loan::query()
-            ->with(['teacher', 'item.category', 'sarpras'])
+            ->with(['teacher', 'item.category', 'creator', 'decider', 'sarpras'])
             ->when(
                 $validated['from'] ?? null,
                 fn ($q, $from) => $q->whereDate('loan_date', '>=', $from)
@@ -297,21 +296,33 @@ class LoanController extends Controller
                 $validated['teacher_id'] ?? null,
                 fn ($q, $id) => $q->where('teacher_id', $id)
             )
-            ->when(
-                $validated['status'] ?? null,
-                fn ($q, $status) => $q->where('status', $status)
-            )
+            ->when($status, function ($q, $status) {
+                if ($status === 'decided') {
+                    return $q->whereIn('status', [Loan::STATUS_APPROVED, Loan::STATUS_REJECTED]);
+                }
+
+                return $q->where('status', $status);
+            })
             ->orderByDesc('loan_date')
+            ->orderByDesc('id')
             ->get();
 
-        $totalQuantity = $loans->sum('quantity');
-        $teachers = Teacher::orderBy('name')->get();
+        // jumlah data per status
+        $summary = $loans->countBy('status');
 
-        return view('loans.report', compact(
-            'loans',
-            'totalQuantity',
-            'teachers'
-        ));
+        // total barang hanya dihitung dari peminjaman yang disetujui (bukan pending / ditolak / batal)
+        $totalQuantity = $loans
+            ->whereIn('status', [
+                Loan::STATUS_APPROVED,
+                Loan::STATUS_HANDED_OVER,
+                Loan::STATUS_RETURNED,
+            ])
+            ->sum('quantity');
+
+        $teachers = Teacher::orderBy('name')->get();
+        $statuses = self::STATUSES;
+
+        return view('loans.report', compact('loans', 'summary', 'totalQuantity', 'teachers', 'statuses'));
     }
 
 }

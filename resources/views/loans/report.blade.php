@@ -1,7 +1,22 @@
-
 @extends('layouts.app')
 
 @section('content')
+
+@php
+    // Label status mengikuti LoanController::STATUSES supaya filter, tabel, dan controller selalu sama
+    $statusLabels = \App\Http\Controllers\LoanController::STATUSES;
+
+    $statusFilter = request('status');
+    $statusFilterLabel = $statusFilter === 'decided'
+        ? 'Disetujui & Ditolak'
+        : ($statusLabels[$statusFilter] ?? 'Semua Status');
+
+    // Total barang hanya dari peminjaman yang disetujui (bukan pending / ditolak / dibatalkan)
+    $approvedQty = $loans->whereIn('status', ['approved', 'handed_over', 'returned'])->sum('quantity');
+
+    // Jumlah transaksi per status
+    $statusCounts = $loans->countBy('status');
+@endphp
 
 <div class="inv-app">
     <div class="inv-main">
@@ -12,7 +27,7 @@
                 <div>
                     <h1 class="h3 fw-bold mb-1">Laporan Barang Keluar</h1>
                     <p class="inv-page-sub mb-0">
-                        Laporan data barang yang telah diserahkan kepada guru.
+                        Laporan peminjaman barang oleh guru. Dapat difilter berdasarkan tanggal, guru, dan status.
                     </p>
                 </div>
 
@@ -36,7 +51,7 @@
 
                         <div class="row g-3">
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="from" class="form-label">
                                     Tanggal Mulai
                                 </label>
@@ -44,10 +59,13 @@
                                     name="from"
                                     id="from"
                                     value="{{ request('from') }}"
-                                    class="form-control">
+                                    class="form-control @error('from') is-invalid @enderror">
+                                @error('from')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="to" class="form-label">
                                     Tanggal Selesai
                                 </label>
@@ -55,10 +73,13 @@
                                     name="to"
                                     id="to"
                                     value="{{ request('to') }}"
-                                    class="form-control">
+                                    class="form-control @error('to') is-invalid @enderror">
+                                @error('to')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="teacher_id" class="form-label">
                                     Guru Penerima
                                 </label>
@@ -78,34 +99,21 @@
 
                                 </select>
                             </div>
+
                             <div class="col-md-3">
                                 <label for="status" class="form-label">Status Peminjaman</label>
 
                                 <select name="status" id="status" class="form-select">
                                     <option value="">Semua Status</option>
 
-                                    <option value="pending" @selected(request('status') === 'pending')>
-                                        Menunggu
-                                    </option>
+                                    @foreach ($statusLabels as $value => $label)
+                                        <option value="{{ $value }}" @selected($statusFilter === $value)>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
 
-                                    <option value="approved" @selected(request('status') === 'approved')>
-                                        Disetujui
-                                    </option>
-
-                                    <option value="rejected" @selected(request('status') === 'rejected')>
-                                        Ditolak
-                                    </option>
-
-                                    <option value="handed_over" @selected(request('status') === 'handed_over')>
-                                        Sudah Diserahkan
-                                    </option>
-
-                                    <option value="returned" @selected(request('status') === 'returned')>
-                                        Dikembalikan
-                                    </option>
-
-                                    <option value="cancelled" @selected(request('status') === 'cancelled')>
-                                        Dibatalkan
+                                    <option value="decided" @selected($statusFilter === 'decided')>
+                                        Disetujui &amp; Ditolak
                                     </option>
                                 </select>
                             </div>
@@ -143,7 +151,7 @@
                                     {{ $loans->count() }}
                                 </div>
                                 <div class="inv-stat-note">
-                                    Jumlah transaksi barang keluar
+                                    Jumlah transaksi sesuai filter
                                 </div>
                             </div>
 
@@ -159,13 +167,13 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="inv-stat-label">
-                                    Total Barang Keluar
+                                    Total Barang Disetujui
                                 </div>
                                 <div class="inv-stat-value">
-                                    {{ number_format($totalQuantity, 0, ',', '.') }}
+                                    {{ number_format($approvedQty, 0, ',', '.') }}
                                 </div>
                                 <div class="inv-stat-note">
-                                    Akumulasi jumlah barang yang diserahkan
+                                    Akumulasi barang berstatus disetujui, dipinjam, dan dikembalikan
                                 </div>
                             </div>
 
@@ -227,6 +235,8 @@
                                 : 'Sekarang' }}
                         </p>
 
+                        <p>Status: {{ $statusFilterLabel }}</p>
+
                         @if(request('teacher_id'))
                             <p>
                                 Guru Penerima:
@@ -245,23 +255,33 @@
                         <p>
                             <strong>Jumlah Transaksi:</strong>
                             {{ $loans->count() }} transaksi
+
+                            @if($statusCounts->count() > 1)
+                                (
+                                @foreach ($statusCounts as $status => $count)
+                                    {{ $statusLabels[$status] ?? $status }}: {{ $count }}@if (! $loop->last), @endif
+                                @endforeach
+                                )
+                            @endif
                         </p>
                     </div>
 
-                    {{-- TABEL BARANG KELUAR --}}
+                    {{-- TABEL PEMINJAMAN --}}
                     <div class="table-responsive report-table-wrap">
                         <table class="report-table">
 
                             <thead>
                                 <tr>
                                     <th width="4%">No</th>
-                                    <th width="12%">Kode Barang</th>
-                                    <th width="19%">Nama Barang</th>
+                                    <th width="10%">Kode Barang</th>
+                                    <th width="16%">Nama Barang</th>
                                     <th width="10%">Kategori</th>
-                                    <th width="16%">Guru Penerima</th>
-                                    <th width="9%">Jumlah</th>
-                                    <th width="10%">Tanggal Keluar</th>
-                                    <th width="12%">Petugas Sarpras</th>
+                                    <th width="13%">Guru Penerima</th>
+                                    <th width="7%">Jumlah</th>
+                                    <th width="9%">Tgl Pinjam</th>
+                                    <th width="11%">Status</th>
+                                    <th width="10%">Petugas Sarpras</th>
+                                    <th width="10%">Keterangan</th>
                                 </tr>
                             </thead>
 
@@ -293,21 +313,36 @@
                                         </td>
 
                                         <td class="text-center">
-                                            {{ $loan->handed_over_at
-                                                ? \Carbon\Carbon::parse($loan->handed_over_at)->format('d/m/Y')
+                                            {{ $loan->loan_date
+                                                ? \Carbon\Carbon::parse($loan->loan_date)->format('d/m/Y')
                                                 : '-' }}
                                         </td>
 
                                         <td>
-                                            {{ $loan->sarpras?->name ?? '-' }}
+                                            {{ $statusLabels[$loan->status] ?? $loan->status }}
+
+                                            @if($loan->handed_over_at)
+                                                <br>
+                                                <small>
+                                                    Keluar: {{ \Carbon\Carbon::parse($loan->handed_over_at)->format('d/m/Y') }}
+                                                </small>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            {{ $loan->sarpras?->name ?? $loan->decider?->name ?? '-' }}
+                                        </td>
+
+                                        <td>
+                                            {{ $loan->status_note ?? $loan->return_note ?? '-' }}
                                         </td>
                                     </tr>
 
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center py-4">
+                                        <td colspan="10" class="text-center py-4">
                                             <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                            Tidak ada data barang keluar ditemukan.
+                                            Tidak ada data peminjaman ditemukan.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -317,14 +352,14 @@
                                 <tfoot>
                                     <tr>
                                         <th colspan="5" class="text-end">
-                                            TOTAL BARANG KELUAR
+                                            TOTAL BARANG DISETUJUI
                                         </th>
 
                                         <th class="text-center">
-                                            {{ number_format($totalQuantity, 0, ',', '.') }}
+                                            {{ number_format($approvedQty, 0, ',', '.') }}
                                         </th>
 
-                                        <th colspan="2"></th>
+                                        <th colspan="4"></th>
                                     </tr>
                                 </tfoot>
                             @endif
@@ -359,7 +394,7 @@
                             <div class="signature-space"></div>
 
                             <p class="signature-name">
-                                {{ $loans->first()?->sarpras?->name ?? 'Nama Petugas' }}
+                                {{ auth()->user()->name }}
                             </p>
 
                             <p>NIP. -</p>
