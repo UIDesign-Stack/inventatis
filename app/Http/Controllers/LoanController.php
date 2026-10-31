@@ -26,11 +26,10 @@ class LoanController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:loan.view')->only(['index', 'show']);
-        $this->middleware('permission:loan.create')->only(['create', 'store', 'destroy']);
+        $this->middleware('permission:loan.view')->only(['index', 'show', 'returns']);
+        $this->middleware('permission:loan.create')->only(['create', 'store', 'destroy', 'returnLoan']);
         $this->middleware('permission:loan.approve')->only(['decide', 'cancel']);
         $this->middleware('permission:loan.handover')->only(['handover']);
-        $this->middleware('permission:loan.return')->only(['returnLoan']);
         $this->middleware('permission:stock-out.report')->only(['report']);
     }
 
@@ -181,6 +180,37 @@ class LoanController extends Controller
             ->with('success', "Serah terima berhasil dicatat dengan nomor surat {$loan->handover_letter_number}.");
     }
 
+    /** Daftar peminjaman yang disetujui / sedang dipinjam dan belum dikembalikan */
+    public function returns(Request $request): View
+    {
+        $returnableStatuses = [Loan::STATUS_APPROVED, Loan::STATUS_HANDED_OVER];
+
+        $loans = Loan::query()
+            ->with(['teacher', 'item'])
+            ->whereIn('status', $returnableStatuses)
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->whereHas('teacher', fn ($t) => $t->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('item', fn ($i) => $i->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%"));
+                });
+            })
+            ->orderBy('loan_date')
+            ->orderBy('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        // semua yang bisa dikembalikan (tanpa pagination) untuk pilihan di form "Catat Pengembalian"
+        $returnable = Loan::query()
+            ->with(['teacher', 'item'])
+            ->whereIn('status', $returnableStatuses)
+            ->orderBy('loan_date')
+            ->orderBy('id')
+            ->get();
+
+        return view('loans.returns', compact('loans', 'returnable'));
+    }
+
     /** Barang dikembalikan guru; stok bertambah lagi */
     public function returnLoan(Request $request, Loan $loan): RedirectResponse
     {
@@ -192,8 +222,9 @@ class LoanController extends Controller
             DB::transaction(function () use ($loan, $validated, $request) {
                 $loan = Loan::lockForUpdate()->findOrFail($loan->id);
 
-                if ($loan->status !== Loan::STATUS_HANDED_OVER) {
-                    throw new RuntimeException('Hanya barang yang sedang dipinjam yang bisa dikembalikan.');
+                // stok sudah dikurangi sejak ACC, jadi disetujui maupun dipinjam aman dikembalikan
+                if (! in_array($loan->status, [Loan::STATUS_APPROVED, Loan::STATUS_HANDED_OVER], true)) {
+                    throw new RuntimeException('Hanya peminjaman yang disetujui atau sedang dipinjam yang bisa dikembalikan.');
                 }
 
                 Item::lockForUpdate()->findOrFail($loan->item_id)->increment('stock', $loan->quantity);
@@ -212,7 +243,7 @@ class LoanController extends Controller
         }
 
         return redirect()
-            ->route('loans.show', $loan)
+            ->route('loans.returns')
             ->with('success', 'Pengembalian berhasil dicatat dan stok barang telah ditambahkan kembali.');
     }
 
@@ -269,8 +300,10 @@ class LoanController extends Controller
             ->with('success', 'Data peminjaman berhasil dihapus.');
     }
 
-    /** Laporan barang keluar: peminjaman yang pernah diserahkan */
-
+    /**
+     * Laporan peminjaman (bisa dicetak).
+     * status = "decided" menampilkan semua yang disetujui + ditolak.
+     */
     public function report(Request $request): View
     {
         $validated = $request->validate([
@@ -286,11 +319,11 @@ class LoanController extends Controller
             ->with(['teacher', 'item.category', 'creator', 'decider', 'sarpras'])
             ->when(
                 $validated['from'] ?? null,
-                fn ($q, $from) => $q->whereDate('loan_date', '>=', $from)
+                fn ($q, $from) => $q->whereRaw('DATE(COALESCE(decided_at, loan_date)) >= ?', [$from])
             )
             ->when(
                 $validated['to'] ?? null,
-                fn ($q, $to) => $q->whereDate('loan_date', '<=', $to)
+                fn ($q, $to) => $q->whereRaw('DATE(COALESCE(decided_at, loan_date)) <= ?', [$to])
             )
             ->when(
                 $validated['teacher_id'] ?? null,
@@ -324,5 +357,4 @@ class LoanController extends Controller
 
         return view('loans.report', compact('loans', 'summary', 'totalQuantity', 'teachers', 'statuses'));
     }
-
 }

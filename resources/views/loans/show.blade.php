@@ -1,179 +1,131 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-3xl mx-auto p-6 space-y-6">
+<div class="container inv-form-wrap">
 
-    {{-- Pesan sukses / error --}}
-    @if (session('success'))
-        <div class="rounded bg-green-100 text-green-800 px-4 py-3">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="rounded bg-red-100 text-red-800 px-4 py-3">{{ session('error') }}</div>
-    @endif
-    @if ($errors->any())
-        <div class="rounded bg-red-100 text-red-800 px-4 py-3">
-            <ul class="list-disc pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+    {{-- Header halaman --}}
+    <a href="{{ route('loans.index') }}" class="inv-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        Data peminjaman
+    </a>
+
+    <div class="inv-page-head">
+        <div>
+            <h1 class="h3 font-display fw-bold mb-1">Detail peminjaman</h1>
+            <p class="inv-page-sub mb-0">
+                {{ $loan->item->name ?? '-' }} &middot; {{ $loan->teacher->name ?? '-' }}
+            </p>
         </div>
-    @endif
-
-    {{-- Header --}}
-    <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold">Detail Peminjaman #{{ $loan->id }}</h1>
-        @php
-            $badge = match ($loan->status) {
-                'approved' => 'bg-blue-100 text-blue-800',
-                'rejected' => 'bg-red-100 text-red-800',
-                'handed_over' => 'bg-green-100 text-green-800',
-                default => 'bg-yellow-100 text-yellow-800',
-            };
-        @endphp
-        <span class="px-3 py-1 rounded-full text-sm font-medium {{ $badge }}">
-            {{ $statuses[$loan->status] ?? $loan->status }}
-        </span>
     </div>
 
-    {{-- Data peminjaman --}}
-    <div class="bg-white shadow rounded p-6">
-        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <dt class="text-sm text-gray-500">Guru</dt>
-                <dd class="font-medium">{{ $loan->teacher->name }}</dd>
+    {{-- Ringkasan --}}
+    <div class="row g-3 mb-3">
+        <div class="col-sm-4">
+            <div class="inv-stat">
+                <div class="inv-stat-label">Status</div>
+                <div class="mt-2">
+                    @switch($loan->status)
+                        @case('pending')
+                            <span class="inv-pill inv-pill--warn">Pending</span>
+                            @break
+                        @case('approved')
+                            <span class="inv-pill inv-pill--brand">Disetujui</span>
+                            @break
+                        @case('rejected')
+                            <span class="inv-pill inv-pill--bad">Ditolak</span>
+                            @break
+                        @case('handed_over')
+                            <span class="inv-pill inv-pill--ok">Dipinjam</span>
+                            @break
+                        @case('returned')
+                            <span class="inv-pill inv-pill--muted">Dikembalikan</span>
+                            @break
+                        @case('cancelled')
+                            <span class="inv-pill inv-pill--muted">Dibatalkan</span>
+                            @break
+                        @default
+                            <span class="text-muted">-</span>
+                    @endswitch
+                </div>
             </div>
-            <div>
-                <dt class="text-sm text-gray-500">Barang</dt>
-                <dd class="font-medium">{{ $loan->item->name }} ({{ $loan->item->code }})</dd>
-            </div>
-            <div>
-                <dt class="text-sm text-gray-500">Jumlah diajukan</dt>
-                <dd class="font-medium">{{ $loan->quantity }} {{ $loan->item->unit }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm text-gray-500">Stok saat ini</dt>
-                <dd class="font-medium">{{ $loan->item->stock }} {{ $loan->item->unit }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm text-gray-500">Tanggal pinjam</dt>
-                <dd class="font-medium">{{ $loan->loan_date->format('d M Y') }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm text-gray-500">Dicatat oleh</dt>
-                <dd class="font-medium">{{ $loan->creator?->name ?? '-' }}</dd>
-            </div>
+        </div>
 
-            @if ($loan->decided_at)
-                <div>
-                    <dt class="text-sm text-gray-500">Keputusan oleh</dt>
-                    <dd class="font-medium">{{ $loan->decider?->name ?? '-' }}</dd>
+        <div class="col-sm-4">
+            <div class="inv-stat">
+                <div class="inv-stat-label">Jumlah</div>
+                <div class="inv-stat-value font-display fw-bold">
+                    {{ $loan->quantity }}
+                    <span class="fs-6 fw-medium text-muted">{{ $loan->item->unit ?? '' }}</span>
                 </div>
-                <div>
-                    <dt class="text-sm text-gray-500">Waktu keputusan</dt>
-                    <dd class="font-medium">{{ $loan->decided_at->format('d M Y H:i') }}</dd>
-                </div>
-            @endif
+            </div>
+        </div>
 
-            @if ($loan->status_note)
-                <div class="sm:col-span-2">
-                    <dt class="text-sm text-gray-500">Catatan</dt>
-                    <dd class="font-medium">{{ $loan->status_note }}</dd>
+        <div class="col-sm-4">
+            <div class="inv-stat">
+                <div class="inv-stat-label">Tanggal pinjam</div>
+                <div class="inv-stat-value font-display fw-bold" style="font-size: 1.5rem;">
+                    @php($loanDate = $loan->decided_at ?? $loan->loan_date)
+                    {{ $loanDate ? \Carbon\Carbon::parse($loanDate)->format('d/m/Y') : '-' }}
                 </div>
-            @endif
-
-            @if ($loan->status === 'handed_over')
-                <div>
-                    <dt class="text-sm text-gray-500">No. surat serah terima</dt>
-                    <dd class="font-medium">{{ $loan->handover_letter_number }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm text-gray-500">Diserahkan oleh</dt>
-                    <dd class="font-medium">{{ $loan->sarpras?->name ?? '-' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm text-gray-500">Waktu serah terima</dt>
-                    <dd class="font-medium">{{ $loan->handed_over_at?->format('d M Y H:i') }}</dd>
-                </div>
-            @endif
-        </dl>
+            </div>
+        </div>
     </div>
 
-    {{-- Keputusan: hanya untuk yang berstatus pending --}}
-    @can('loan.approve')
-        @if ($loan->isPending())
-            <div class="bg-white shadow rounded p-6">
-                <h2 class="text-lg font-semibold mb-4">Keputusan</h2>
-                <form method="POST" action="{{ route('loans.decide', $loan) }}" class="space-y-4">
-                    @csrf
-                    @method('PATCH')
+    {{-- Rincian --}}
+    <div class="card inv-panel">
+        <section class="inv-form-section">
+            <h2 class="inv-form-title">Informasi peminjaman</h2>
 
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="decision" value="approved" required>
-                            <span>Setujui (ACC)</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="decision" value="rejected">
-                            <span>Tolak</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="decision" value="pending">
-                            <span>Tunda (pending) dengan catatan</span>
-                        </label>
-                    </div>
+            <dl class="row mb-0 gy-3">
+                <dt class="col-sm-4 fw-normal text-muted">Peminjam (guru)</dt>
+                <dd class="col-sm-8 mb-0">
+                    @if ($loan->teacher)
+                        <a href="{{ route('teachers.show', $loan->teacher) }}">{{ $loan->teacher->name }}</a>
+                    @else
+                        -
+                    @endif
+                </dd>
 
-                    <div>
-                        <label for="status_note" class="block text-sm text-gray-600 mb-1">
-                            Alasan (wajib jika ditolak atau di-pending)
-                        </label>
-                        <textarea id="status_note" name="status_note" rows="3" maxlength="500"
-                                  class="w-full border rounded px-3 py-2">{{ old('status_note') }}</textarea>
-                    </div>
+                <dt class="col-sm-4 fw-normal text-muted">Barang</dt>
+                <dd class="col-sm-8 mb-0">
+                    @if ($loan->item)
+                        {{ $loan->item->name }} <span class="inv-code">({{ $loan->item->code }})</span>
+                    @else
+                        -
+                    @endif
+                </dd>
 
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Simpan Keputusan
-                    </button>
-                </form>
-            </div>
-        @endif
-    @endcan
+                <dt class="col-sm-4 fw-normal text-muted">Catatan status</dt>
+                <dd class="col-sm-8 mb-0">
+                    @if (filled($loan->status_note))
+                        {!! nl2br(e($loan->status_note)) !!}
+                    @else
+                        <span class="text-muted">-</span>
+                    @endif
+                </dd>
+            </dl>
+        </section>
 
-    {{-- Serah terima: hanya untuk yang sudah disetujui --}}
-    @can('loan.handover')
-        @if ($loan->isApproved())
-            <div class="bg-white shadow rounded p-6">
-                <h2 class="text-lg font-semibold mb-4">Serah Terima Barang</h2>
-                <p class="text-sm text-gray-600 mb-4">
-                    Nomor surat dibuat otomatis. Stok akan dikurangi sebanyak
-                    {{ $loan->quantity }} {{ $loan->item->unit }} setelah serah terima dicatat.
-                </p>
-                <form method="POST" action="{{ route('loans.handover', $loan) }}"
-                      onsubmit="return confirm('Catat serah terima dan kurangi stok?')">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                        Catat Serah Terima
-                    </button>
-                </form>
-            </div>
-        @endif
-    @endcan
+        <section class="inv-form-section">
+            <h2 class="inv-form-title">Riwayat proses</h2>
 
-    {{-- Aksi bawah --}}
-    <div class="flex items-center justify-between">
-        <a href="{{ route('loans.index') }}" class="text-blue-600 hover:underline">&larr; Kembali ke daftar</a>
+            <dl class="row mb-0 gy-3">
+                <dt class="col-sm-4 fw-normal text-muted">Diajukan oleh</dt>
+                <dd class="col-sm-8 mb-0">{{ $loan->creator->name ?? '-' }}</dd>
 
-        @can('loan.create')
-            @if (in_array($loan->status, ['pending', 'rejected'], true))
-                <form method="POST" action="{{ route('loans.destroy', $loan) }}"
-                      onsubmit="return confirm('Hapus data peminjaman ini?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                </form>
-            @endif
-        @endcan
+                <dt class="col-sm-4 fw-normal text-muted">Diputuskan oleh</dt>
+                <dd class="col-sm-8 mb-0">{{ $loan->decider->name ?? '-' }}</dd>
+
+                <dt class="col-sm-4 fw-normal text-muted">Diserahkan oleh (sarpras)</dt>
+                <dd class="col-sm-8 mb-0">{{ $loan->sarpras->name ?? '-' }}</dd>
+
+                <dt class="col-sm-4 fw-normal text-muted">Waktu diserahkan</dt>
+                <dd class="col-sm-8 mb-0 inv-num">{{ $loan->handed_over_at?->format('d/m/Y H:i') ?? '-' }}</dd>
+
+                <dt class="col-sm-4 fw-normal text-muted">Pengembalian diterima oleh</dt>
+                <dd class="col-sm-8 mb-0">{{ $loan->returner->name ?? '-' }}</dd>
+            </dl>
+        </section>
     </div>
 </div>
 @endsection

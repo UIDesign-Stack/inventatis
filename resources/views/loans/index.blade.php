@@ -47,6 +47,7 @@
                 <tr>
                     <th>No</th>
                     <th>Tanggal Pinjam</th>
+                    <th>Tanggal Kembali</th>
                     <th>Guru</th>
                     <th>Barang</th>
                     <th>Jumlah</th>
@@ -58,7 +59,12 @@
                 @forelse ($loans as $loan)
                     <tr>
                         <td>{{ $loans->firstItem() + $loop->index }}</td>
-                        <td>{{ $loan->loan_date->format('d/m/Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($loan->decided_at ?? $loan->loan_date)->format('d/m/Y') }}</td>
+                        <td>
+                            {{ $loan->returned_at
+                                ? \Carbon\Carbon::parse($loan->returned_at)->format('d/m/Y')
+                                : '-' }}
+                        </td>
                         <td>{{ $loan->teacher->name }}</td>
                         <td>{{ $loan->item->name }} ({{ $loan->item->code }})</td>
                         <td>{{ $loan->quantity }} {{ $loan->item->unit }}</td>
@@ -74,7 +80,13 @@
                                     <span class="badge bg-danger">Ditolak</span>
                                     @break
                                 @case('handed_over')
-                                    <span class="badge bg-success">Diserahkan</span>
+                                    <span class="badge bg-success">Dipinjam</span>
+                                    @break
+                                @case('returned')
+                                    <span class="badge bg-dark">Dikembalikan</span>
+                                    @break
+                                @case('cancelled')
+                                    <span class="badge bg-secondary">Dibatalkan</span>
                                     @break
                             @endswitch
                         </td>
@@ -82,7 +94,7 @@
                             <a href="{{ route('loans.show', $loan) }}" class="btn btn-sm btn-info">Detail</a>
 
                             @can('loan.create')
-                                @if (in_array($loan->status, ['pending', 'rejected'], true))
+                                @if (in_array($loan->status, ['pending', 'rejected', 'cancelled'], true))
                                     <form action="{{ route('loans.destroy', $loan) }}" method="POST" class="d-inline"
                                           onsubmit="return confirm('Hapus data peminjaman ini?')">
                                         @csrf
@@ -95,7 +107,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">Belum ada data peminjaman.</td>
+                        <td colspan="8" class="text-center">Belum ada data peminjaman.</td>
                     </tr>
                 @endforelse
             </tbody>

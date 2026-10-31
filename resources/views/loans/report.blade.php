@@ -273,15 +273,16 @@
                             <thead>
                                 <tr>
                                     <th width="4%">No</th>
-                                    <th width="10%">Kode Barang</th>
-                                    <th width="16%">Nama Barang</th>
-                                    <th width="10%">Kategori</th>
-                                    <th width="13%">Guru Penerima</th>
-                                    <th width="7%">Jumlah</th>
+                                    <th width="9%">Kode Barang</th>
+                                    <th width="15%">Nama Barang</th>
+                                    <th width="9%">Kategori</th>
+                                    <th width="12%">Guru Penerima</th>
+                                    <th width="6%">Jumlah</th>
                                     <th width="9%">Tgl Pinjam</th>
-                                    <th width="11%">Status</th>
-                                    <th width="10%">Petugas Sarpras</th>
-                                    <th width="10%">Keterangan</th>
+                                    <th width="9%">Tgl Kembali</th>
+                                    <th width="10%">Status</th>
+                                    <th width="9%">Petugas Sarpras</th>
+                                    <th width="8%">Keterangan</th>
                                 </tr>
                             </thead>
 
@@ -313,15 +314,19 @@
                                         </td>
 
                                         <td class="text-center">
-                                            {{ $loan->loan_date
-                                                ? \Carbon\Carbon::parse($loan->loan_date)->format('d/m/Y')
+                                            {{ \Carbon\Carbon::parse($loan->decided_at ?? $loan->loan_date)->format('d/m/Y') }}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {{ $loan->returned_at
+                                                ? \Carbon\Carbon::parse($loan->returned_at)->format('d/m/Y')
                                                 : '-' }}
                                         </td>
 
                                         <td>
                                             {{ $statusLabels[$loan->status] ?? $loan->status }}
 
-                                            @if($loan->handed_over_at)
+                                            @if($loan->handed_over_at && $loan->status !== 'returned')
                                                 <br>
                                                 <small>
                                                     Keluar: {{ \Carbon\Carbon::parse($loan->handed_over_at)->format('d/m/Y') }}
@@ -340,7 +345,7 @@
 
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center py-4">
+                                        <td colspan="11" class="text-center py-4">
                                             <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                             Tidak ada data peminjaman ditemukan.
                                         </td>
@@ -359,7 +364,7 @@
                                             {{ number_format($approvedQty, 0, ',', '.') }}
                                         </th>
 
-                                        <th colspan="4"></th>
+                                        <th colspan="5"></th>
                                     </tr>
                                 </tfoot>
                             @endif

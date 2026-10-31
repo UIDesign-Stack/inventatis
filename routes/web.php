@@ -42,8 +42,12 @@ Route::middleware('auth')->group(function () {
 
     // Loan dan report
     Route::get('loans/report', [LoanController::class, 'report'])->name('loans.report');
+
+    // Pengembalian (harus sebelum resource)
+    Route::get('loans/returns', [LoanController::class, 'returns'])->name('loans.returns');
+    Route::patch('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
+
     Route::patch('loans/{loan}/decide', [LoanController::class, 'decide'])->name('loans.decide');
     Route::patch('loans/{loan}/handover', [LoanController::class, 'handover'])->name('loans.handover');
-    Route::resource('loans', LoanController::class)
-        ->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::resource('loans', LoanController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
 });

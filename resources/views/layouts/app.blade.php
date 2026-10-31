@@ -26,7 +26,8 @@
                 ['label' => 'Kategori',   'route' => 'categories.index', 'can' => 'category.manage', 'active' => ['categories.*']],
                 ['label' => 'Guru',       'route' => 'teachers.index',   'can' => 'teacher.manage',  'active' => ['teachers.*']],
                 ['label' => 'Supplier',   'route' => 'suppliers.index',  'can' => 'supplier.manage', 'active' => ['suppliers.*']],
-                ['label' => 'Peminjaman', 'route' => 'loans.index',      'can' => 'loan.view',       'active' => ['loans.*']],
+                ['label' => 'Peminjaman',   'route' => 'loans.index',   'can' => 'loan.view', 'active' => ['loans.index', 'loans.create', 'loans.show']],
+                ['label' => 'Pengembalian', 'route' => 'loans.returns', 'can' => ['loan.view', 'loan.create'], 'active' => ['loans.returns']],
                 ['label' => 'User',       'route' => 'users.index',      'can' => 'user.view',       'active' => ['users.*']],
             ];
 
@@ -37,7 +38,8 @@
             ];
 
             $visible = fn (array $list) => auth()->check()
-                ? collect($list)->filter(fn ($m) => Route::has($m['route']) && auth()->user()->can($m['can']))
+                ? collect($list)->filter(fn ($m) => Route::has($m['route'])
+                    && collect((array) $m['can'])->every(fn ($p) => auth()->user()->can($p)))
                 : collect();
 
             $visibleMenus = $visible($menus);
