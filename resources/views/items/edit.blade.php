@@ -29,7 +29,7 @@
                 <div class="col-md-4">
                     <label for="code" class="form-label">Kode barang <span class="text-danger">*</span></label>
                     <input type="text" id="code" name="code" value="{{ old('code', $item->code) }}"
-                           class="form-control @error('code') is-invalid @enderror" required disabled>
+                           class="form-control @error('code') is-invalid @enderror" required readonly>
                     @error('code')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
