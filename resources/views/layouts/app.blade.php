@@ -50,7 +50,7 @@
         <nav class="navbar navbar-expand-md inv-nav">
             <div class="container">
                 <a class="inv-brand font-display fw-bold" href="{{ url('/') }}">
-                    <div class="school-logo">
+                    <div class="logo">
                             <img src="{{ asset('images/logo.png') }}"
                                 alt="Logo Sekolah">
                         </div>

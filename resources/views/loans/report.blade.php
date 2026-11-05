@@ -25,7 +25,7 @@
             {{-- HEADER HALAMAN --}}
             <div class="inv-page-head no-print">
                 <div>
-                    <h1 class="h3 fw-bold mb-1">Laporan Barang Keluar</h1>
+                    <h1 class="h3 fw-bold mb-1">LAPORAN BARANG KELUAR / PEMINJAMAN</h1>
                     <p class="inv-page-sub mb-0">
                         Laporan peminjaman barang oleh guru. Dapat difilter berdasarkan tanggal, guru, dan status.
                     </p>
@@ -194,22 +194,21 @@
                     <div class="report-header">
 
                         <div class="school-logo">
-                            <img src="{{ asset('images/logo.png') }}"
+                            <img src="{{ asset('images/logo_surat.png') }}"
                                 alt="Logo Sekolah">
                         </div>
 
                         <div class="school-info">
-                            <h2>PEMERINTAH KABUPATEN / KOTA</h2>
-                            <h2>DINAS PENDIDIKAN</h2>
+                            <h1>PEMERINTAH KABUPATEN BEKASI</h1>
+                            <h1>DINAS PENDIDIKAN</h1>
                             <h1>SMPN 6 BABELAN</h1>
 
                             <p>
-                                Jl.Pintu Gerbang Timur Vila Gading Harapan, RT. 004, RW. 002
+                               Jl. Pintu Gerbang Timur Villa Gading Harapan, Rt.04 Rw.02 Kel. Kebalen, Kec. Babelan, Kab Bekasi, 17610
                             </p>
 
                             <p>
-                                Email: sekolah@email.com |
-                                Telepon: (021) XXXXX
+                                email : smpn.6bal@gmail.com
                             </p>
                         </div>
 
@@ -385,12 +384,12 @@
                                 Mardianto, S.Pd.
                             </p>
 
-                            <p>NIP. -</p>
+                            <p>NIP. 196704011998031005</p>
                         </div>
 
                         <div class="signature-box">
                             <p>
-                                {{ config('app.school_city', 'Kabupaten/Kota') }},
+                                {{ config('app.school_city', 'Babelan') }},
                                 {{ now()->translatedFormat('d F Y') }}
                             </p>
 
@@ -402,7 +401,7 @@
                                 {{ auth()->user()->name }}
                             </p>
 
-                            <p>NIP. -</p>
+                            <p>NIP. 198506152024211004</p>
                         </div>
 
                     </div>

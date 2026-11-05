@@ -26,7 +26,7 @@
     <header class="container py-3 py-lg-4">
         <div class="d-flex align-items-center justify-content-between">
             <a href="{{ url('/') }}" class="d-flex align-items-center gap-3 text-decoration-none text-reset">
-                <div class="school-logo">
+                <div class="logo">
                     <img src="{{ asset('images/logo.png') }}"
                         alt="Logo Sekolah">
                 </div>

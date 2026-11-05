@@ -509,11 +509,15 @@
 }
 
 .school-logo img {
-    width: 55px;
-    height: 55px;
+    width: 130px;
+    height: 130px;
     object-fit: contain;
 }
-
+.logo img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
 .school-info {
     flex: 1;
 }
@@ -522,12 +526,14 @@
     font-size: 14px;
     font-weight: 600;
     margin: 0;
+
 }
 
 .school-info h1 {
     font-size: 20px;
     font-weight: 800;
     margin: 3px 0;
+    font-family: "Times New Roman", Times, serif;
 }
 
 .school-info p {
@@ -547,6 +553,7 @@
     font-weight: 700;
     text-decoration: underline;
     margin-bottom: 5px;
+    font-family: "Times New Roman", Times, serif;
 }
 
 .report-title p {
